@@ -1,0 +1,45 @@
+version: "3.7"
+
+networks:
+  employee:
+    driver: bridge
+
+services:
+  ems-backend:
+    build:
+      context: .
+      dockerfile: employee-system/Dockerfile
+    image: ems-backend
+    ports:
+      - "8080:8080"
+    container_name: ems-backend
+    networks:
+      - employee
+    environment:
+      server.port: 8080
+      server.address: 127.0.0.1
+    depends_on:
+      - mysqldb
+     
+  mysqldb:
+    image: mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - employee
+    environment:
+      - MYSQL_ROOT_PASSWORD=root123
+ 
+  ems-app:
+    build:
+      context: .
+      dockerfile: ems-app/Dockerfile
+    image: ems-app
+    ports:
+      - "3000:3000"
+    container_name: ems-app
+    networks:
+      - employee
+    environment:
+      server.port: 3000
+      server.address: 127.0.0.1  
